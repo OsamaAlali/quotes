@@ -5,10 +5,11 @@ package quotes;
 
 import com.google.gson.Gson;
 import com.google.common.reflect.TypeToken;
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
+
+import java.io.*;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -18,26 +19,70 @@ public class App {
     }
 
     public static void main(String[] args) {
-        Gson gson = new Gson();
-        try {
-            FileReader file =new FileReader("recentquotes.json");
+//        Gson gson = new Gson();
 
+String apiUrl="http://api.forismatic.com/api/1.0/?method=getQuote&format=json&lang=en";
+        try {
+            URL url= new URL(apiUrl);
+      HttpURLConnection connection=(HttpURLConnection)url.openConnection();
+connection.setRequestMethod("GET");
+connection.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.95 Safari/537.11");
+
+          int status = connection.getResponseCode();
+
+            if(status ==200){
+                InputStream inputStream= connection.getInputStream();
+                InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
+                BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+                String line = bufferedReader.readLine();
+                StringBuilder lineBilder=new StringBuilder(line);
+
+                while (line != null){
+                    lineBilder.append(line);
+                    line = bufferedReader.readLine();
+
+                }
+                System.out.println(lineBilder);
+                bufferedReader.close();
+        FileWriter fw=new FileWriter("mydata.json");
+                fw.write(String.valueOf(lineBilder));
+                fw.close();
+            }else {
+                Gson gson=new Gson();
+                System.out.println("An error occurred with API So we Reading Local Data status "+ status);
+                FileReader file =new FileReader("mydata.json");
+//
             BufferedReader line= new BufferedReader(file);
 
-            ArrayList<Qutes> obj=gson.fromJson(line,new TypeToken<ArrayList<Qutes>>(){}.getType());
+                ArrayList<Qutes>  obj=gson.fromJson(file,new TypeToken<ArrayList<Qutes>>(){}.getType());
+//            ArrayList<Qutes> obj=gson.fromJson(line,new TypeToken<ArrayList<Qutes>>(){}.getType());
+            }
 
-
-int random =(int) (Math.random()* obj.size());
-
-            // System.out.println(obj.get(random));  This Method for lab08
-            System.out.println(obj.get(5));// This Method using for testing
-
-
-            line.close();
-
+       connection.disconnect();
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
+//        try {
+//            FileReader file =new FileReader("recentquotes.json");
+//
+//            BufferedReader line= new BufferedReader(file);
+//
+//            ArrayList<Qutes> obj=gson.fromJson(line,new TypeToken<ArrayList<Qutes>>(){}.getType());
+//
+//
+//int random =(int) (Math.random()* obj.size());
+//
+//            // System.out.println(obj.get(random));  This Method for lab08
+//            System.out.println(obj.get(5));// This Method using for testing
+//
+//
+//            line.close();
+//
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
 
 
     }
