@@ -32,15 +32,15 @@ Gson gson=new Gson();
             int random =(int) (Math.random()* obj.size());
 
             // System.out.println(obj.get(random));  This Method for lab08
-            System.out.println(obj.get(0));// This Method using for testing
+            System.out.println(obj.get(0).author);// This Method using for testing
 
 
             line.close();
 
-           String out ="Qutes{tags=[], author='George Orwell', like='null', text=' â€œHis answer to every problem, every setback was â€œI will work harder!â€� â€”which he had adopted as his personal motto.â€�'}";
+           String out ="Marilyn Monroe";
 
 
-        assertEquals(out,obj.get(5));
+        assertEquals(out,obj.get(0).author);
     }
 
 }
