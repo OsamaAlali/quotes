@@ -18,72 +18,73 @@ public class App {
         return "Hello World!";
     }
 
-    public static void main(String[] args) {
-//        Gson gson = new Gson();
-
-String apiUrl="http://api.forismatic.com/api/1.0/?method=getQuote&format=json&lang=en";
+    public static void apiDat(){
+        String apiUrl="http://api.forismatic.com/api/1.0/?method=getQuote&format=json&lang=en";
         try {
             URL url= new URL(apiUrl);
-      HttpURLConnection connection=(HttpURLConnection)url.openConnection();
-connection.setRequestMethod("GET");
-connection.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.95 Safari/537.11");
+            HttpURLConnection connection=(HttpURLConnection)url.openConnection();
+            connection.setRequestMethod("GET");
+            connection.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.95 Safari/537.11");
 
-          int status = connection.getResponseCode();
+            int status = connection.getResponseCode();
 
-            if(status ==200){
+            if(status == 200){
                 InputStream inputStream= connection.getInputStream();
                 InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
                 BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
-                String line = bufferedReader.readLine();
-                StringBuilder lineBilder=new StringBuilder(line);
+                String line ;
 
+                StringBuilder lineBilder=new StringBuilder();
+                line = bufferedReader.readLine();
                 while (line != null){
-                    lineBilder.append(line);
-                    line = bufferedReader.readLine();
 
+                    lineBilder.append(line);
+
+                    line = bufferedReader.readLine();
+                    //if (line != null )
                 }
                 System.out.println(lineBilder);
                 bufferedReader.close();
-        FileWriter fw=new FileWriter("mydata.json");
+                FileWriter fw=new FileWriter("mydata.json");
                 fw.write(String.valueOf(lineBilder));
                 fw.close();
             }else {
-                Gson gson=new Gson();
-                System.out.println("An error occurred with API So we Reading Local Data status "+ status);
-                FileReader file =new FileReader("mydata.json");
-//
-            BufferedReader line= new BufferedReader(file);
-
-                ArrayList<Qutes>  obj=gson.fromJson(file,new TypeToken<ArrayList<Qutes>>(){}.getType());
-//            ArrayList<Qutes> obj=gson.fromJson(line,new TypeToken<ArrayList<Qutes>>(){}.getType());
+                // if Error in connection it will call local Data file
+               localData();
             }
 
-       connection.disconnect();
+            connection.disconnect();
         } catch (MalformedURLException e) {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
-        }
-//        try {
-//            FileReader file =new FileReader("recentquotes.json");
-//
-//            BufferedReader line= new BufferedReader(file);
-//
-//            ArrayList<Qutes> obj=gson.fromJson(line,new TypeToken<ArrayList<Qutes>>(){}.getType());
-//
-//
-//int random =(int) (Math.random()* obj.size());
-//
-//            // System.out.println(obj.get(random));  This Method for lab08
-//            System.out.println(obj.get(5));// This Method using for testing
-//
-//
-//            line.close();
-//
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
 
+        }
+    }
+
+    public static void localData(){
+        Gson gson=new Gson();
+//        System.out.println("An error occurred with API So we Reading Local Data status "+ status);
+        FileReader file = null;
+        try {
+            file = new FileReader("recentquotes.json");
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+//
+        BufferedReader line= new BufferedReader(file);
+
+        ArrayList<Qutes>  obj=gson.fromJson(file,new TypeToken<ArrayList<Qutes>>(){}.getType());
+        int random =(int) (Math.random()* obj.size());
+//
+        System.out.println(obj.get(random));
+    }
+
+    public static void main(String[] args) {
+
+        // Call function ApiDat  if status not 200 the method will call local data Method inside apiData
+
+        apiDat();
 
     }
 }
